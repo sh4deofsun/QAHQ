@@ -1,16 +1,29 @@
 """
 file handler websocket or rest api
 """
+# standard library
 import time
+
 from typing import Annotated
-from pydantic import BaseModel, Field, EmailStr
+
+# from pydantic import BaseModel, Field, EmailStr
 from fastapi import FastAPI, Request, UploadFile, File, Body, Header, Response, BackgroundTasks
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.exceptions import HTTPException
 
+from Applications.TestCounterSingleton import test_counter
 
-app = FastAPI()
+app = FastAPI(
+    title="QAHQ",
+    description="QAHQ",
+    version="0.0.1",
+    contact={
+        "name": "BY",
+        },
+)
 
+app.include_router(router=test_counter.router,
+                   tags=["Robot Framework"])
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
@@ -36,11 +49,3 @@ def read_root():
 @app.post("/mirror/", response_model=None)
 async def mirror(msg : Annotated[str, Body(embed=True)]) -> JSONResponse:
     return JSONResponse(content={"Your message" : msg})
-
-@app.post("/uploadfile/")
-async def create_upload_file(file: Annotated[UploadFile | None, File()] = None):
-    if not file:
-        # return {"message": "No upload file sent"}
-        return HTTPException(detail={'message': 'There was no file.'}, status_code=400)
-    else:
-        return {"filename": file.filename}
