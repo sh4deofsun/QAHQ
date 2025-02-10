@@ -8,7 +8,7 @@ from typing import Annotated
 
 # from pydantic import BaseModel, Field, EmailStr
 from fastapi import FastAPI, Request, UploadFile, File, Body, Header, Response, BackgroundTasks
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from fastapi.exceptions import HTTPException
 
 from Applications.TestCounterSingleton import test_counter
@@ -49,3 +49,8 @@ def read_root():
 @app.post("/mirror/", response_model=None)
 async def mirror(msg : Annotated[str, Body(embed=True)]) -> JSONResponse:
     return JSONResponse(content={"Your message" : msg})
+
+favicon_path = "favicon.ico"
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse(favicon_path)

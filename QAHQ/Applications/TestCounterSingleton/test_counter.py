@@ -25,7 +25,6 @@ class TestTags:
         print(f"Passed: {result.statistics.total.passed}")
         print(f"Skipped: {result.statistics.total.skipped}")
         
-    
 
 @router.post("/get_test_count/")
 async def get_test_count(file: Annotated[UploadFile | None, File()] = None) -> dict:
