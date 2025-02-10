@@ -24,7 +24,6 @@ class TestTags:
         print(f"Failed: {result.statistics.total.failed}")
         print(f"Passed: {result.statistics.total.passed}")
         print(f"Skipped: {result.statistics.total.skipped}")
-        # print(result.suite.to_dict())
         
     
 
@@ -36,12 +35,4 @@ async def get_test_count(file: Annotated[UploadFile | None, File()] = None) -> d
     else:
         file_content = await file.read()
         test_tags.get_test_count(file_content)
-        # file_content = await file.read()
-        # result = ExecutionResult(file_content)
-
-        # print(result.statistics.total.total)
         return {"filename": file.filename}
-    # test_tags.get_test_count(xml_path)
-    # with open(xml_path, 'rb') as file:
-    #     # print(file.read())
-    #     test_tags.get_test_count(file.read())
