@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from typing import Annotated
 from robot.api import ExecutionResult
+from robot import rebot
 
 router = APIRouter()
 
@@ -35,4 +36,5 @@ async def send_test_report(file: Annotated[UploadFile | None, File()] = None) ->
     else:
         file_content = await file.read()
         test_tags.get_test_count(file_content)
-        return {"filename": file.filename}
+        file1, file2 = rebot(file_content, outputdir="__Example__/rebot_example/Result", output="output.xml")
+        return {"filename": file.filename, "file1": file1.filename, "file2": file2.filename}
