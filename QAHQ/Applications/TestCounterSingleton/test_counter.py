@@ -1,6 +1,8 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from typing import Annotated
 from robot.api import ExecutionResult
+from sqlalchemy.orm import Session
+from ...Databases import database, models
 
 router = APIRouter()
 
@@ -20,18 +22,42 @@ class TestTags:
 
     def get_test_count(self, output_xml_path):
         result = ExecutionResult(output_xml_path)
-        print(f"Total: {result.statistics.total.total}")
-        print(f"Failed: {result.statistics.total.failed}")
-        print(f"Passed: {result.statistics.total.passed}")
-        print(f"Skipped: {result.statistics.total.skipped}")
-        
+        return result.statistics.total
 
 @router.post("/get_test_count/")
-async def get_test_count(file: Annotated[UploadFile | None, File()] = None) -> dict:
+async def get_test_count(
+    file: Annotated[UploadFile | None, File()] = None,
+    db: Session = Depends(database.get_db)
+) -> dict:
     test_tags = TestTags()
     if not file:
         return HTTPException(detail={'message': 'There was no file.'}, status_code=400)
     else:
-        file_content = await file.read()
-        test_tags.get_test_count(file_content)
-        return {"filename": file.filename}
+        # Save temp file to process
+        content = await file.read()
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+            
+        stats = test_tags.get_test_count(tmp_path)
+        
+        # Save to DB
+        test_result = models.TestResult(
+            suite_name=file.filename, # Or parse from XML
+            total_tests=stats.total,
+            passed_tests=stats.passed,
+            failed_tests=stats.failed,
+            skipped_tests=stats.skipped,
+            report_path=file.filename # Placeholder
+        )
+        db.add(test_result)
+        db.commit()
+        
+        return {
+            "filename": file.filename,
+            "total": stats.total,
+            "passed": stats.passed,
+            "failed": stats.failed,
+            "skipped": stats.skipped
+        }
