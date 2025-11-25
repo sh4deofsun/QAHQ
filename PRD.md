@@ -87,6 +87,14 @@ QA teams often struggle with:
     - **Local Authentication**: Dedicated method for **Admin** users (credentials stored locally with secure hashing).
 - **Mechanism**: Validate credentials against the appropriate source (LDAP server or Local DB).
 - **Session**: Issue JWT or session tokens upon successful authentication.
+### 4.6 Frontend
+- **Framework**: React + Vite.
+- **Styling**: Vanilla CSS with a modern dark theme.
+- **Features**:
+    - **Login**: Secure authentication with JWT.
+    - **Dashboard**: Real-time view of active workers and system stats.
+    - **Worker Management**: Ability to execute commands on connected workers.
+    - **Test Results**: View recent test execution history.
 
 ## 5. Technical Requirements
 - **Language**: Python 3.x
@@ -96,7 +104,6 @@ QA teams often struggle with:
 
 
 ## 6. Future Scope
-- **Dashboard UI**: A frontend to visualize test trends over time.
 - **Email Notifications**: Automated email alerts for failed tests (referenced in `Operations` folder description).
 
 
