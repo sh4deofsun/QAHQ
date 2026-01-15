@@ -66,7 +66,7 @@ You can configure the backend using environment variables. Create a `.env` file 
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `SECRET_KEY` | Secret key for JWT signing | `09d25e...` (Change this!) |
+| `SECRET_KEY` | Secret key for JWT signing. **REQUIRED** for persistent sessions. If missing, a random key is generated on startup. | (Randomly Generated) |
 | `LDAP_SERVER_URL` | URL of your LDAP server | `ldap://localhost:389` |
 | `LDAP_BIND_DN` | DN for LDAP binding | `cn=admin,dc=example,dc=com` |
 | `LDAP_BIND_PASSWORD` | Password for LDAP binding | `admin` |
