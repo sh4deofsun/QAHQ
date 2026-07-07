@@ -1,4 +1,9 @@
-__Example__/
+# Project data & build output
+data/
+*.db
+node_modules/
+frontend/dist/
+*.tsbuildinfo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
