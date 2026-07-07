@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: qahq
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: qahq
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qahq"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://qahq:${POSTGRES_PASSWORD}@db:5432/qahq
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD}
+      MCP_API_KEY: ${MCP_API_KEY:-}
+      LDAP_SERVER_URL: ${LDAP_SERVER_URL:-}
+      LDAP_BIND_DN: ${LDAP_BIND_DN:-}
+      LDAP_BIND_PASSWORD: ${LDAP_BIND_PASSWORD:-}
+      LDAP_SEARCH_BASE: ${LDAP_SEARCH_BASE:-}
+      LDAP_USER_FILTER: ${LDAP_USER_FILTER:-(uid={username})}
+      CORS_ORIGINS: '["https://localhost"]'
+    volumes:
+      - artifacts:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  artifacts:
